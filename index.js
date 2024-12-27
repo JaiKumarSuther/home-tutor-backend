@@ -2,6 +2,11 @@
 const express = require('express'); // Framework for building web applications
 require('dotenv').config(); // Loads environment variables from a .env file
 const connectDB = require("./config/db"); // Import database connection function
+const passport = require('passport');
+const session = require('express-session');
+
+// Load Passport configuration
+require('./config/passport');
 
 
 // Initialize the Express application
@@ -10,8 +15,20 @@ const app = express();
 // body parser
 app.use(express.json());
 
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: true
+    })
+)
+
+//initialize the middlewares
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Load port number from environment variables
-const PORT = process.env.PORT || 5000; // Fallback to port 5000 if PORT is not defined
+const PORT = process.env.PORT || 5000; // Callback to port 5000 if PORT is not defined
 
 // Connect to the database
 connectDB();
@@ -19,6 +36,8 @@ connectDB();
 // Middleware to handle routes for students and tutors
 app.use('/api/students', require('./routes/studentRoutes')); // Routes for student-related APIs
 app.use('/api/tutors', require('./routes/tutorRoutes')); // Routes for tutor-related APIs
+// Middleware to handle Google authentication routes
+app.use('/auth', require('./routes/authRoutes'));
 
 // Define a basic home route
 app.get('/', (req, res) => {
