@@ -1,43 +1,42 @@
 // Import required modules
 const express = require('express'); // Framework for building web applications
 require('dotenv').config(); // Loads environment variables from a .env file
-const connectDB = require("./config/db"); // Import database connection function
-const passport = require('passport');
-const session = require('express-session');
+const connectDB = require('./config/db'); // Import database connection function
+const passport = require('passport'); // Passport.js for authentication
+const session = require('express-session'); // Session middleware
 
 // Load Passport configuration
 require('./config/passport');
 
-
 // Initialize the Express application
 const app = express();
 
-// body parser
+// Middleware for parsing JSON bodies
 app.use(express.json());
 
+// Configure session middleware
 app.use(
     session({
-        secret: process.env.SESSION_SECRET,
-        resave: false,
-        saveUninitialized: true
+        secret: process.env.SESSION_SECRET, // Load secret from environment variables
+        resave: false, // Do not save session if not modified
+        saveUninitialized: true, // Save uninitialized sessions
     })
-)
+);
 
-//initialize the middlewares
+// Initialize Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Load port number from environment variables
-const PORT = process.env.PORT || 5000; // Callback to port 5000 if PORT is not defined
+// Load port number from environment variables or use default (5000)
+const PORT = process.env.PORT || 5000;
 
 // Connect to the database
 connectDB();
 
-// Middleware to handle routes for students and tutors
+// Middleware to handle routes
 app.use('/api/students', require('./routes/studentRoutes')); // Routes for student-related APIs
 app.use('/api/tutors', require('./routes/tutorRoutes')); // Routes for tutor-related APIs
-// Middleware to handle Google authentication routes
-app.use('/auth', require('./routes/authRoutes'));
+app.use('/auth', require('./routes/authRoutes')); // Routes for Google authentication
 
 // Define a basic home route
 app.get('/', (req, res) => {

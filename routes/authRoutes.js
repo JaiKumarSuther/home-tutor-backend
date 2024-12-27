@@ -1,25 +1,26 @@
 const express = require('express');
 const passport = require('passport');
+
 const router = express.Router();
 
-// Google login route
-router.get('/google', passport.authenticate('google', {scope: ['profile', 'email']}));
-
-// Google Callback Route
-router.get('/google/callback', passport.authenticate('google', {failureRedirect: '/'}), (req, res) => {
-    // Successful authentication, redirect or respond with token
-    const token = req.user ? req.user.generateJWT(): null;
-    res.redirect(`/dashboard?token=${token}`);
-})
-
-// Logout route
-router.get('/logout', (req, res) => {
-    req.logOut((err) => {
-        if(err) {
-            return res.status(500).send(err);
-        } 
-        res.redirect('/');
+// Initiate Google authentication
+router.get(
+    '/google',
+    passport.authenticate('google', {
+        scope: ['profile', 'email'], // Request user's profile and email
     })
-})
+);
+
+// Handle the callback from Google
+router.get(
+    '/google/callback',
+    passport.authenticate('google', {
+        failureRedirect: '/login', // Redirect to login on failure
+    }),
+    (req, res) => {
+        // Successful authentication
+        res.redirect('/dashboard'); // Redirect to your application's dashboard or any other route
+    }
+);
 
 module.exports = router;

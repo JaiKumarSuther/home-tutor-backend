@@ -4,46 +4,29 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const Student = require('../models/studentModel');
 const Tutor = require('../models/tutorModel');
 
+// Configure the Google Strategy
 passport.use(
     new GoogleStrategy(
         {
-            clientID: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: '/auth/google/callback',
+            clientID: process.env.GOOGLE_CLIENT_ID, // Your Google client ID
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET, // Your Google client secret
+            callbackURL: 'http://localhost:4000/auth/google/callback', // Your redirect URI
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
-                // Find or create user
-                const {email, name} = profile._json;
-
-                // Check for existing student
-                let user = await Student.findOne({email});
-                if(!user) {
-                    user = await Tutor.findOne({email});
-                }
-
-                if (!user) {
-                    user = new Student({
-                        name, 
-                        email,
-                        password: '',
-                        profilePicture: profile.photos[0].value
-                    });
-                    await user.save();
-                }
-                done(null, user);
-
-
-            } catch(err) {
-                done(err, false);
+                // Handle user authentication or creation logic
+                console.log(profile); // Log profile details for debugging
+                return done(null, profile);
+            } catch (error) {
+                return done(error, null);
             }
         }
     )
-)
+);
 
-// Serialize User
+// Serialize and deserialize user information
 passport.serializeUser((user, done) => {
-    done(null, user.id);
+    done(null, user);
 });
 
 // Deserialize user
