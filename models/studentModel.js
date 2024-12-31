@@ -27,12 +27,6 @@ const studentSchema = new Schema({
     }
 });
 
-// Method to generate JWT for a student
-studentSchema.methods.generateJWT = () => {
-    const payload = {id: this._id, role: 'Student'};
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
-    return token;
-}
 
 module.exports = model('Student', studentSchema);
 

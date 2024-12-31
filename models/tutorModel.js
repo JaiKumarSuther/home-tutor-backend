@@ -38,12 +38,6 @@ const tutorSchema = new Schema({
     }
 });
 
-// Method to generate JWT for a tutor
-tutorSchema.methods.generateJWT = () => {
-    const payload = { id: this._id, role: 'tutor' }; // Define the payload
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' }); // Generate token
-    return token;
-};
 
 module.exports = model('Tutor', tutorSchema);
 
